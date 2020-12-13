@@ -1,0 +1,69 @@
+Szymon Sławiński
+
+lab_08
+
+Zadanie 1
+
+delimiter //
+create trigger kreatura_before_insert
+before insert on kreatura
+for each row
+begin
+if new.waga<0
+then
+set new.waga=0;
+end if;
+end
+//
+delimiter ;
+
+Zadanie 2
+
+delimiter //
+create trigger wyprawa_after_delete
+AFTER DELETE ON wyprawa
+FOR EACH ROW
+BEGIN
+DECLARE kierownik_nazwa VARCHAR(100);
+SET kierownik_nazwa = (SELECT kreatura.nazwa FROM kreatura WHERE idKreatury = OLD.kierownik);
+INSERT INTO archiwum_wypraw VALUES (OLD.id_wyprawy, OLD.nazwa, OLD.data_rozpoczecia, OLD.data_zakonczenia, kierownik_nazwa);
+END
+//
+DELIMITER ;
+
+Zadanie 3
+
+a)
+DELIMITER $$
+CREATE PROCEDURE eliksir_sily(IN id int)
+BEGIN
+Update kreatura set udzwig = 1.2 * udzwig where idKreatury= id;
+END
+$$
+DELIMITER ;
+
+b)
+DELIMITER //
+CREATE FUNCTION wielkie_litery(text varchar(255))
+RETURNS VARCHAR(255)
+BEGIN
+DECLARE ucase VARCHAR(255);
+SET @ucase = UCASE(text);
+RETURN @ucase;
+END
+//
+DELIMITER ;
+
+
+Zadanie 5
+
+delimiter $$
+create procedure parametry_kreatur(out parametry int)
+begin
+select concat("Średnia: ", avg(udzwig)," ","Suma: " sum(udzwig)," ","Maks: ", max(udzwig) into parametry from kreatura;
+end
+$$
+delimiter ;
+
+call parametry_kreatury(@p);
+select @p;
